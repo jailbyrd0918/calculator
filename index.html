@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta 
+      name="viewport" 
+      content="width=device-width, initial-scale=1.0" 
+    />
+    <title>Calculator</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="container">
+      <!-- output display -->
+      <input
+        type="text" 
+        name="display" 
+        id="display" 
+        class="display"
+        readonly
+      ></input>
+
+      <!-- buttons -->
+      <div class="btn-container">
+        <button class="btn btn-ac" onclick="clearExpression()">AC</button>
+        <button class="btn btn-del" onclick="undoExpression()">DEL</button>
+        <button class="btn btn-percent" onclick="appendToDisplay('%')">%</button>
+        <button class="btn operator" onclick="appendToDisplay('/')">/</button>
+        
+        <button class="btn operand" onclick="appendToDisplay(7)">7</button>
+        <button class="btn operand" onclick="appendToDisplay(8)">8</button>
+        <button class="btn operand" onclick="appendToDisplay(9)">9</button>
+        <button class="btn operator" onclick="appendToDisplay('*')">*</button>
+
+        <button class="btn operand" onclick="appendToDisplay(4)">4</button>
+        <button class="btn operand" onclick="appendToDisplay(5)">5</button>
+        <button class="btn operand" onclick="appendToDisplay(6)">6</button>
+        <button class="btn operator" onclick="appendToDisplay('-')">-</button>
+
+        <button class="btn operand" onclick="appendToDisplay(1)">1</button>
+        <button class="btn operand" onclick="appendToDisplay(2)">2</button>
+        <button class="btn operand" onclick="appendToDisplay(3)">3</button>
+        <button class="btn operator" onclick="appendToDisplay('+')">+</button>
+
+        <button class="btn operand" onclick="appendToDisplay(0)">0</button>
+        <button class="btn operand" onclick="appendToDisplay('00')">00</button>
+        <button class="btn btn-frac" onclick="appendToDisplay('.')">.</button>
+        <button class="btn btn-eval" onclick="evaluateExpression()">=</button>        
+      </div>  
+    </div>
+
+    <script>
+      const display = document.getElementById("display");
+
+      var expression = [];
+
+      function appendToDisplay(value) { 
+        display.style.color = "white";
+        
+        expression.push(value);
+        updateDisplay();
+      }
+
+      function undoExpression() {
+        expression.pop();
+        updateDisplay();
+      }
+
+      function clearExpression() {
+        expression = [];
+        updateDisplay();
+      }
+
+      function evaluateExpression() {
+        try {
+          const result = eval(expression.join('').replace('%', "/100"));
+          if (result === undefined) {
+            throw Error;
+          }
+          else {          
+            display.style.color = "orange";
+            clearExpression();      
+            display.value = result;
+          }
+        } 
+        catch (error) {
+          updateDisplay("Error");
+        }
+      }
+
+      function updateDisplay() {
+          const expRegex = /\*\*/;
+          const oprRegex = /(\+|\-|\*|\/)/;
+
+          const formattedExpression = expression.join('')
+          .replace(expRegex, '^')
+          .replace(oprRegex, " $1 ");
+          display.value = formattedExpression;  
+      }
+
+      document.addEventListener("keydown", function (event) {
+        const opRegex = /[\d+\-*/.%]/;
+        const key = event.key;
+
+        if (opRegex.test(key)) {
+          event.preventDefault();
+          appendToDisplay(key);
+        }
+        else if (key === "Backspace") {
+          event.preventDefault();
+          undoExpression();
+        }
+        else if (key === "Escape") {
+          event.preventDefault();
+          clearExpression();
+        } 
+        else if (key === "Enter") {
+          event.preventDefault();
+          evaluateExpression();
+        } 
+      });
+    </script>
+  </body>
+</html>
